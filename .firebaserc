@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "kotprog-11c86": {
+      "hosting": {
+        "kotprog": [
+          "kotprog-11c86"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "kotprog-11c86"
+  }
+}
