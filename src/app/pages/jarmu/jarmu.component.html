@@ -1,0 +1,50 @@
+<div class="table-container">
+  <!-- A járművek listájának szöveges megjelenítése -->
+  <h2>Járművek</h2>
+  <div [ngClass]="{ 'red-text': jarmutipusok.length === 0, 'green-text': jarmutipusok.length > 0 }">
+    <h2 *ngIf="jarmutipusok.length === 0">Nincs egy jármű sem!</h2>
+    <h2 *ngIf="jarmutipusok.length > 0">Vannak járművek!</h2>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="custom-table">
+    <!-- Fejléc -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let jarmu; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ jarmu.id }}</td>
+    </ng-container>
+    <ng-container matColumnDef="nev">
+      <th mat-header-cell *matHeaderCellDef>Név</th>
+      <td mat-cell *matCellDef="let jarmu; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ jarmu.nev }}</td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let jarmu" class="action-buttons">
+        <button mat-icon-button color="primary" (click)="editJarmu(jarmu)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteJarmu(jarmu.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <!-- Sorok iterálása -->
+    <tr mat-header-row *matHeaderRowDef="['id', 'nev', 'actions']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'nev', 'actions'];"></tr>
+  </table>
+
+  <br>
+  <h3>Létrehozás / Módosítás</h3>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>ID:</mat-label>
+      <input matInput type="number" formControlName="id" readonly>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Név:</mat-label>
+      <input matInput type="text" formControlName="nev">
+    </mat-form-field>
+
+    <button mat-button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">Mentés</button>
+  </form>
+</div>

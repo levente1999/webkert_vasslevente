@@ -1,0 +1,25 @@
+<!-- app.component.html -->
+<mat-toolbar>
+    <mat-toolbar-row>
+      <mat-icon>more_horiz</mat-icon>
+      <button mat-button routerLink="/jarat">Járat</button>
+      <button mat-button routerLink="/megallohely">Megállóhely</button>
+      <button mat-button routerLink="/menetrend">Menetrend</button>
+      <button mat-button routerLink="/jaratmegallo">Járatmegálló</button>
+      <button mat-button routerLink="/jarmu">Jármű</button>
+      <button *ngIf="!(loggedInUser)" mat-button routerLink="/login">Bejelentkezés</button>
+      <button *ngIf="loggedInUser" mat-button routerLink="/login" (click)="logout()">Kijelentkezés</button>
+
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <div>
+    <router-outlet></router-outlet>
+  </div>  
+  
+<!--<app-jarat></app-jarat>
+<app-megallohely></app-megallohely>
+<app-menetrend></app-menetrend>
+<app-jaratmegallo></app-jaratmegallo>
+<app-jarmu></app-jarmu>-->
+
+  

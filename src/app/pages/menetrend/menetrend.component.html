@@ -1,0 +1,131 @@
+<div class="table-container">
+  <!-- Menetrendek listájának szöveges megjelenítése -->
+  <h2>Menetrendek</h2>
+  <div [ngClass]="{ 'red-text': menetrendek.length === 0, 'green-text': menetrendek.length > 0 }">
+    <h2 *ngIf="menetrendek.length === 0">Nincs egy menetrend sem!</h2>
+    <h2 *ngIf="menetrendek.length > 0">Vannak menetrendek!</h2>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="custom-table">
+    <!-- Fejléc -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let menetrend; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ menetrend.id }}</td>
+    </ng-container>
+    <ng-container matColumnDef="jarat_id">
+      <th mat-header-cell *matHeaderCellDef>Járat ID</th>
+      <td mat-cell *matCellDef="let menetrend; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ menetrend.jarat_id }}</td>
+    </ng-container>
+    <ng-container matColumnDef="indulas_ido">
+      <th mat-header-cell *matHeaderCellDef>Indulás időpontja</th>
+      <td mat-cell *matCellDef="let menetrend; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ menetrend.indulas_ido}}</td>
+    </ng-container>
+    <ng-container matColumnDef="indulas_megallo_id">
+      <th mat-header-cell *matHeaderCellDef>Indulás megállóhelye</th>
+      <td mat-cell *matCellDef="let menetrend; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ getMegallohelyNevById(menetrend.indulas_megallo_id) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="erkezes_ido">
+      <th mat-header-cell *matHeaderCellDef>Érkezés időpontja</th>
+      <td mat-cell *matCellDef="let menetrend; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ menetrend.erkezes_ido }}</td>
+    </ng-container>
+    <ng-container matColumnDef="erkezes_megallo_id">
+      <th mat-header-cell *matHeaderCellDef>Érkezés megállóhelye</th>
+      <td mat-cell *matCellDef="let menetrend; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ getMegallohelyNevById(menetrend.erkezes_megallo_id) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let menetrend" class="action-buttons">
+        <button mat-icon-button color="primary" (click)="editMenetrend(menetrend)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteMenetrend(menetrend.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <!-- Sorok iterálása -->
+    <tr mat-header-row *matHeaderRowDef="['id', 'jarat_id', 'indulas_ido', 'indulas_megallo_id', 'erkezes_ido', 'erkezes_megallo_id', 'actions']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'jarat_id', 'indulas_ido', 'indulas_megallo_id', 'erkezes_ido', 'erkezes_megallo_id', 'actions'];"></tr>
+  </table>
+
+  <br>
+  <h3>Létrehozás / Módosítás</h3>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>ID:</mat-label>
+      <input matInput type="text" formControlName="id" readonly>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Járat:</mat-label>
+      <mat-select formControlName="jarat_id">
+        <mat-option *ngFor="let jarat of jaratok" [value]="jarat.id">{{ jarat.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div formGroupName="indulas_ido" class="subForm">
+      <mat-form-field>
+        <mat-label>Indulás órája:</mat-label>
+        <input matInput type="number" min="0" max="59" formControlName="ora">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Indulás perce:</mat-label>
+        <input matInput type="number" min="0" max="59" formControlName="perc">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field>
+      <mat-label>Indulás megállóhelye:</mat-label>
+      <mat-select formControlName="indulas_megallo_id">
+        <mat-option *ngFor="let megallohely of megallohelyek" [value]="megallohely.id">{{ megallohely.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  <div formGroupName="erkezes_ido" class="subForm">
+    <mat-form-field>
+      <mat-label>Érkezés órája:</mat-label>
+      <input matInput type="number" min="0" max="59" formControlName="ora">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Érkezés perce:</mat-label>
+      <input matInput type="number" min="0" max="59" formControlName="perc">
+    </mat-form-field>
+  </div>
+
+    <mat-form-field>
+      <mat-label>Érkezés megállóhelye:</mat-label>
+      <mat-select formControlName="erkezes_megallo_id">
+        <mat-option *ngFor="let megallohely of megallohelyek" [value]="megallohely.id">{{ megallohely.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" [disabled]="form.invalid">Létrehozás</button>
+  </form>
+
+</div>
+
+
+<!--<div>
+<table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Járat ID</th>
+        <th>Indulás Idő</th>
+        <th>Indulás Megálló ID</th>
+        <th>Érkezés Idő</th>
+        <th>Érkezés Megálló ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let menetrend of menetrendek">
+        <td>{{ menetrend.id }}</td>
+        <td>{{ menetrend.jarat_id }}</td>
+        <td>{{ menetrend.indulas_ido }}</td>
+        <td>{{ menetrend.indulas_megallo_id }}</td>
+        <td>{{ menetrend.erkezes_ido }}</td>
+        <td>{{ menetrend.erkezes_megallo_id }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>  -->

@@ -1,0 +1,132 @@
+<div class="table-container">
+  <!-- A járatok listájának szöveges megjelenítése -->
+  <h2>Járatok</h2>
+  <div [ngSwitch]="jaratok.length">
+    <h2 *ngSwitchCase="0" class="red-text">Nincs egy járat sem!</h2>
+    <h2 *ngSwitchCase="1" class="green-text">Egy járat van!</h2>
+    <h2 *ngSwitchDefault class="green-text">Vannak járatok!</h2>
+  </div>
+  <div>
+    <!-- Form csoport -->
+    <form [formGroup]="form" (ngSubmit)="onSzures()">
+
+      <mat-form-field>
+        <mat-label for="jarmuSelect">Válasszon járművet:</mat-label>
+          <mat-select id="jarmuSelect" formControlName="jarmu_id">
+            <mat-option *ngFor="let jarmu of jarmuvek" [value]="jarmu.id">{{ jarmu.nev }}</mat-option>
+          </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Küldés</button>
+  </form>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="custom-table">
+    <!-- Fejléc -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let jarat; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ jarat.id }}</td>
+    </ng-container>
+    <ng-container matColumnDef="nev">
+      <th mat-header-cell *matHeaderCellDef>Név</th>
+      <td mat-cell *matCellDef="let jarat; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ jarat.nev }}</td>
+    </ng-container>
+    <ng-container matColumnDef="jarmu_id">
+      <th mat-header-cell *matHeaderCellDef>Jármű</th>
+      <td mat-cell *matCellDef="let jarat; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ getJarmuNevById(jarat.jarmu_id) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="indulas_id">
+      <th mat-header-cell *matHeaderCellDef>Induló állomás</th>
+      <td mat-cell *matCellDef="let jarat; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ getMegallohelyNevById(jarat.indulas_id) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="erkezes_id">
+      <th mat-header-cell *matHeaderCellDef>Végállomás</th>
+      <td mat-cell *matCellDef="let jarat; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ getMegallohelyNevById(jarat.erkezes_id) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let jarat" class="action-buttons">
+        <span>
+        <button mat-icon-button color="primary" (click)="editJarat(jarat)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteJarat(jarat.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </span>
+      </td>
+    </ng-container>
+    <!-- Sorok iterálása -->
+    <tr mat-header-row *matHeaderRowDef="['id', 'nev','jarmu_id','indulas_id','erkezes_id', 'actions']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'nev','jarmu_id','indulas_id','erkezes_id', 'actions'];"></tr>
+  </table>
+
+  <br>
+  <h3>Létrehozás / Módosítás</h3>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>ID:</mat-label>
+      <input matInput type="number" formControlName="id" readonly>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Név:</mat-label>
+      <input matInput type="text" formControlName="nev">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Jármű:</mat-label>
+      <mat-select formControlName="jarmu_id">
+        <mat-option *ngFor="let jarmu of jarmuvek" [value]="jarmu.id">{{ jarmu.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Indulás:</mat-label>
+      <mat-select formControlName="indulas_id">
+        <mat-option *ngFor="let megallohely of megallohelyek" [value]="megallohely.id">{{ megallohely.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Érkezés:</mat-label>
+      <mat-select formControlName="erkezes_id">
+        <mat-option *ngFor="let megallohely of megallohelyek" [value]="megallohely.id">{{ megallohely.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">Létrehozzás</button>
+  </form>
+
+</div>
+
+
+<!--<div>
+<h1>Járatok</h1>
+<div [ngClass]="{ 'red-text': jaratok.length === 0, 'green-text': jaratok.length > 0 }">
+    <h2 *ngIf="jaratok.length === 0">Nincs egy járat sem!</h2>
+    <h2 *ngIf="jaratok.length > 0">Vannak járatok!</h2>
+
+</div>
+
+<table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Név</th>
+        <th>Jármű ID</th>
+        <th>Indulás ID</th>
+        <th>Érkezés ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let jarat of jaratok">
+        <td>{{ jarat.id }}</td>
+        <td>{{ jarat.nev }}</td>
+        <td>{{ jarat.jarmu_id }}</td>
+        <td>{{ jarat.indulas_id }}</td>
+        <td>{{ jarat.erkezes_id }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>-->

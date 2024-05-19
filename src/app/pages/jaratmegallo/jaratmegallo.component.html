@@ -1,0 +1,121 @@
+<div class="table-container">
+  <!-- Jaratmegallok listájának szöveges megjelenítése -->
+  <h2>Járatmegállók</h2>
+  <div [ngClass]="{ 'red-text': jaratmegallok.length === 0, 'green-text': jaratmegallok.length > 0 }">
+    <h2 *ngIf="jaratmegallok.length === 0">Nincs egy járatmegálló sem!</h2>
+    <h2 *ngIf="jaratmegallok.length > 0">Vannak járatmegállók!</h2>
+  </div>
+
+  <div>
+    <!-- Form csoport -->
+    <form [formGroup]="form" (ngSubmit)="onSzures()">
+
+    <!-- Jármű select -->
+   <mat-form-field>
+    <mat-label for="jaratSelect">Válasszon járművet:</mat-label>
+    <mat-select id="jaratSelect" formControlName="jarat_id">
+      <mat-option *ngFor="let jarat of jaratok" [value]="jarat.id">{{ jarat.nev }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button type="submit" mat-raised-button color="primary">Küldés</button>
+  </form>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="custom-table">
+    <!-- Fejléc -->
+    <!--<ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let jaratmegallo; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ jaratmegallo.id }}</td>
+    </ng-container>-->
+    <ng-container matColumnDef="jarat_id">
+      <th mat-header-cell *matHeaderCellDef>Járat ID</th>
+      <td mat-cell *matCellDef="let jaratmegallo; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{  getJaratNevById(jaratmegallo.jarat_id) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="sorszam">
+      <th mat-header-cell *matHeaderCellDef>Sorszám</th>
+      <td mat-cell *matCellDef="let jaratmegallo; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ jaratmegallo.sorszam }}</td>
+    </ng-container>
+    <ng-container matColumnDef="megallo_id">
+      <th mat-header-cell *matHeaderCellDef>Megállóhely</th>
+      <td mat-cell *matCellDef="let jaratmegallo; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ getMegallohelyNevById(jaratmegallo.megallo_id) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="ido_perc">
+      <th mat-header-cell *matHeaderCellDef>Idő perc</th>
+      <td mat-cell *matCellDef="let jaratmegallo; let i = index" [ngStyle]="{'background-color': i % 2 === 0 ? '#f0f0f0' : 'transparent'}">{{ jaratmegallo.ido_perc }}</td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let jaratmegallo" class="action-buttons">
+        <button mat-icon-button color="primary" (click)="editJaratmegallo(jaratmegallo)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteJaratmegallo(jaratmegallo.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <!-- Sorok iterálása -->
+    <tr mat-header-row *matHeaderRowDef="['jarat_id', 'sorszam','megallo_id', 'ido_perc', 'actions']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['jarat_id', 'sorszam','megallo_id', 'ido_perc', 'actions'];"></tr>
+  </table>
+
+  <br>
+  <h3>Létrehozás / Módosítás</h3>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>ID:</mat-label>
+      <input matInput type="text" formControlName="id" readonly>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Járat:</mat-label>
+      <mat-select formControlName="jarat_id">
+        <mat-option *ngFor="let jarat of jaratok" [value]="jarat.id">{{ jarat.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Sorszám:</mat-label>
+      <input matInput type="number" formControlName="sorszam">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Megállóhely:</mat-label>
+      <mat-select formControlName="megallo_id">
+        <mat-option *ngFor="let megallo of megallohelyek" [value]="megallo.id">{{ megallo.nev }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+
+    <mat-form-field>
+      <mat-label>Idő perc:</mat-label>
+      <input matInput type="number" formControlName="ido_perc">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" [disabled]="form.invalid">Létrehozás</button>
+  </form>
+</div>
+
+
+<!--<div>
+<table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Járat ID</th>
+        <th>Megálló ID</th>
+        <th>Sorszám</th>
+        <th>Idő perc</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let jaratmegallo of jaratmegallok">
+        <td>{{ jaratmegallo.id }}</td>
+        <td>{{ jaratmegallo.jarat_id }}</td>
+        <td>{{ jaratmegallo.megallo_id }}</td>
+        <td>{{ jaratmegallo.sorszam }}</td>
+        <td>{{ jaratmegallo.ido_perc }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>-->
